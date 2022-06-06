@@ -26,4 +26,4 @@ Make sure to replace the version number with the current version.
 
 Make sure to replace the `DISCORD_BOT_TOKEN` parameter with the actual discord token.
 
-`docker run -d --restart=always -p 8000:8000 drazenbebic/pokezerrb:1.0.0 -e DISCORD_BOT_TOKEN="TOKEN" --name PokeZerrb`
+`docker run -d --name pokezerrb --restart=always -p 8000:8000 -e DISCORD_BOT_TOKEN="TOKEN" drazenbebic/pokezerrb:1.0.0`
