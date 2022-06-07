@@ -1,7 +1,12 @@
-const { Client, Intents } = require('discord.js');
-const yargs = require('yargs/yargs');
-const { Pokedex } = require('./src/pokedex');
-require('dotenv').config();
+import { Message, Client, Intents } from "discord.js";
+import * as yargs from "yargs";
+import PokedexModule from "./pokedex-module";
+import PokedexInterface from "./interfaces/pokedex-interface";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const Pokedex: PokedexInterface = new PokedexModule();
 
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
@@ -11,9 +16,9 @@ client.on('ready', () => {
     console.log('PokéZerrb ready.');
 });
 
-client.on('messageCreate', async (message) => {
+client.on('messageCreate', async (message: Message) => {
     // Abort early if the bot wasn't mentioned directly.
-    if (!message.mentions.has(client.user.id)) {
+    if (!client || !client.user || !message.mentions.has(client.user.id)) {
         return;
     }
 
@@ -22,74 +27,71 @@ client.on('messageCreate', async (message) => {
     const cleanString = message.content
         .replace(mention, '')
         .replace(' ', '')
-        .toLowerCase();
+        .toLowerCase()
+        .split(' ');
 
-    const argv        = yargs(cleanString).argv;
+    const argv = await yargs(cleanString).argv;
     const pokemonName = argv._[0];
 
-    let pokemon;
-    let pokemonSpecies;
-    let flavorText;
-    let sprite;
     let lang = 'en';
-    let name;
     let evolvesFrom;
     let evolvesFromName;
 
     // Set the language parameter
-    if (argv.lang && argv.lang.length === 2) {
+    if (argv.lang && typeof argv.lang === 'string' && argv.lang.length === 2) {
         lang = argv.lang.toLowerCase();
     }
 
-    try {
-        pokemonSpecies = await Pokedex.getPokemonSpecies(pokemonName);
-    } catch (error) {
+    let pokemonSpecies = await Pokedex.getPokemonSpecies(pokemonName);
+
+    if (!pokemonSpecies) {
         message.channel.send("Couldn't find that pokemon.");
         return;
     }
 
-    try {
-        pokemon = await Pokedex.getPokemon(pokemonName);
-    } catch (error) {
+    let pokemon = await Pokedex.getPokemon(pokemonName);
+
+    if (!pokemon) {
         message.channel.send("Couldn't find that pokemon.");
         return;
-    }
-
-    // Add the sprite
-    if (pokemon.sprites.front_default) {
-        sprite = pokemon.sprites.front_default;
     }
 
     // Retrieve the name
-    name = Pokedex.getPokemonName(pokemonSpecies, lang);
+    let name = Pokedex.getPokemonName(pokemonSpecies, lang);
 
-    // Add flavor text
-    flavorText = Pokedex.getPokemonFlavorText(pokemonSpecies, lang);
+    // Retrieve the flavor text
+    let flavorText = Pokedex.getPokemonFlavorText(pokemonSpecies, lang);
 
     // Check for evolutions
-    if (argv.evolutions || argv.e) {
+    if (argv.evolutions && typeof argv.evolutions === 'boolean') {
         if (pokemonSpecies.evolves_from_species) {
             try {
                 evolvesFrom = await Pokedex.getPokemonSpecies(pokemonSpecies.evolves_from_species.name);
+
+                if (evolvesFrom) {
+                    evolvesFromName = Pokedex.getPokemonName(evolvesFrom, lang);
+                }
             } catch (error) {
                 message.channel.send("Couldn't find that pokemon.");
                 return;
             }
-
-            evolvesFromName = Pokedex.getPokemonName(evolvesFrom, lang);
         }
     }
 
-    let messageToSend = ''
-        + "**" + name + "**"
-        + "\n"
-        + "*-- Description --*"
-        + "\n"
-        + flavorText
-        + "\n";
+    let messageToSend = "**" + name + "**";
+
+    if (flavorText) {
+        messageToSend += ''
+            + "\n"
+            + "*-- Description --*"
+            + "\n"
+            + flavorText
+            + "\n";
+    }
 
     if (evolvesFrom) {
         messageToSend += ''
+            + "\n"
             + "*-- Evolution Chain --*"
             + "\n"
             + evolvesFromName + ' | '

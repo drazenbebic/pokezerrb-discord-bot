@@ -1,4 +1,4 @@
-const { Pokedex } = require('./src/pokedex');
+const { PokedexModule } = require('./src/pokedex-module');
 
 const tests = [
   {
