@@ -1,3 +1,9 @@
 node_modules
+dist
+test
+.git
+.gitignore
+.github
 .env
-npm-debug.log
+.env.example
+jest.config.js
