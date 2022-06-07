@@ -1,7 +1,9 @@
 node_modules
 dist
+test
 .git
 .gitignore
 .github
 .env
 .env.example
+jest.config.js
