@@ -1,4 +1,3 @@
-
 export interface FlavorTextEntry {
     flavor_text: string
     language: {
@@ -48,6 +47,75 @@ export interface PokemonSpeciesVarieties {
         name: string
         url: string
     }
+}
+
+// Pokemon
+
+export interface PokemonAbility {
+    ability: {
+        name: string
+        url: string
+    }
+    is_hidden: boolean
+    slot: number
+}
+
+export interface PokemonForm {
+    name: string
+    url: string
+}
+
+export interface PokemonVersionDetails {
+    rarity: number
+    version: {
+        name: string
+        url: string
+    }
+}
+
+export interface PokemonHeldItem {
+    item: {
+        name: string
+        url: string
+    }
+    version_details: Array<PokemonVersionDetails>
+}
+
+export interface PokemonVersionGroupDetails {
+    level_learned_at: number
+    move_learn_method: {
+        name: string
+        url: string
+    }
+    version_group: {
+        name: string
+        url: string
+    }
+}
+
+export interface PokemonMove {
+    move: {
+        name: string
+        url: string
+    }
+    version_group_details: Array<PokemonVersionGroupDetails>
+}
+
+export interface PokemonGameIndex {
+    game_index: number
+    version: {
+        name: string
+        url: string
+    }
+}
+
+export interface PokemonSprites {
+    back_default: string|null
+    back_gray: string|null
+    back_transparent: string|null
+    front_default: string|null
+    front_gray: string|null
+    front_transparent: string|null
 }
 
 // Endpoints
@@ -103,5 +171,59 @@ export interface PokemonSpecies {
 }
 
 export interface Pokemon {
-
+    abilities: Array<PokemonAbility>
+    base_experience: number
+    forms: Array<PokemonForm>
+    game_indices: Array<PokemonGameIndex>
+    height: number
+    held_items: Array<PokemonHeldItem>
+    id: number
+    is_default: boolean
+    location_area_encounters: string
+    moves: Array<PokemonMove>
+    name: string
+    order: number
+    past_types: Array<any>
+    species: {
+        name: string
+        url: string
+    }
+    sprites: {
+        back_default: string|null
+        back_female: string|null
+        back_shiny: string|null
+        back_shiny_female: string|null
+        front_default: string|null
+        front_female: string|null
+        front_shiny: string|null
+        front_shiny_female: string|null
+        other: {
+            dream_world: {
+                front_default: string|null
+                front_female: string|null
+            }
+            home: {
+                front_default: string|null
+                front_female: string|null
+                front_shiny: string|null
+                front_shiny_female: string|null
+            }
+            "official-artwork": {
+                font_default: string|null
+            }
+        }
+        versions: {
+            "generation-i": {
+                "red-blue": PokemonSprites
+                yellow: PokemonSprites
+            }
+            "generation-ii": {}
+            "generation-iii": {}
+            "generation-iv": {}
+            "generation-v": {}
+            "generation-vi": {}
+            "generation-vii": {}
+            "generation-viii": {}
+        }
+    }
 }
